@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -10,7 +11,26 @@ import (
 )
 
 func (app *application) createSchoolHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Created a new Schoool...")
+	//struct to hold school provided by request
+	var input struct {
+		Name    string   `json:"name"`
+		Level   string   `json:"level"`
+		Contact string   `json:"contact"`
+		Phone   string   `json:"phone"`
+		Email   string   `json:"email"`
+		Website string   `json:"website,omitempty"`
+		Address string   `json:"address"`
+		Mode    []string `json:"mode"`
+	}
+	//new json.Decoder instance
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	//Print request
+	fmt.Fprintf(w, "%+v\n", input)
 }
 
 func (app *application) showSchoolHandler(w http.ResponseWriter, r *http.Request) {
