@@ -2,7 +2,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -22,10 +21,11 @@ func (app *application) createSchoolHandler(w http.ResponseWriter, r *http.Reque
 		Address string   `json:"address"`
 		Mode    []string `json:"mode"`
 	}
-	//new json.Decoder instance
-	err := json.NewDecoder(r.Body).Decode(&input)
+	//decode JSON request
+	err := app.readJSON(w, r, &input)
 	if err != nil {
-		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		app.badRequestResponse(w, r, err)
+
 		return
 	}
 
