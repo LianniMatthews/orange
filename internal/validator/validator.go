@@ -3,11 +3,13 @@
 package validator
 
 import (
+	"net/url"
 	"regexp"
 )
 
 var (
 	EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	PhoneRX = regexp.MustCompile(`^\+?\(?[0-9]{3}\)?\s?-\s?[0-9]{3}\s?-\s?[0-9]{4}$`)
 )
 
 // validation errors map
@@ -45,4 +47,32 @@ func In(element string, list ...string) bool {
 		}
 	}
 	return false
+}
+
+// return true if a string match a specific regex pattern
+func Matches(value string, rx *regexp.Regexp) bool {
+	return rx.MatchString(value)
+}
+
+// check if string is a valid website
+func ValidWebsite(website string) bool {
+	_, err := url.ParseRequestURI(website)
+	return err == nil
+}
+
+// check if errors map needs an entry
+func (v *Validator) Check(ok bool, key string, message string) {
+	if !ok {
+		v.AddError(key, message)
+	}
+}
+
+// check for repeating values in a slice
+func Unique(values []string) bool {
+	uniqueValues := make(map[string]bool)
+	for _, value := range values {
+		uniqueValues[value] = true
+	}
+
+	return len(values) == len(uniqueValues)
 }
